@@ -19,18 +19,6 @@ void *glp(void *ptr, const char *msg) {
     return ptr;
 }
 
-SDL_GLContext initialize(SDL_Window *window) {
-    glv(SDL_Init(SDL_INIT_VIDEO), "SDL failed to initialize");
-
-    glv(SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4), "Failed to set version");
-    glv(SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 5), "Failed to set version");
-
-    window = glp(SDL_CreateWindow("Window Test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE), "Window could not be created");
-    SDL_GLContext context = glp(SDL_GL_CreateContext(window), "OpenGL context could not be created");
-
-    glClearColor(0,0,0,1);
-    return context;
-}
 
 void handle_events(bool *quit) {
     SDL_Event e;
@@ -43,22 +31,32 @@ void handle_events(bool *quit) {
     }
 }
 
-void render(SDL_Window *window) {
-    glClear(GL_COLOR_BUFFER_BIT);
-    SDL_GL_SwapWindow(window);
-}
+int main() {
+    glv(SDL_Init(SDL_INIT_VIDEO), "SDL failed to initialize");
 
-int main(int argc, char **argv) {
-    (void) argc;
-    (void) argv;
+    SDL_Window *window = glp(
+        SDL_CreateWindow("Window Test",
+                         SDL_WINDOWPOS_CENTERED, 
+                         SDL_WINDOWPOS_CENTERED, 
+                         640, 
+                         480, 
+                         SDL_WINDOW_OPENGL
+        ),
+    "Window could not be created");
 
-    SDL_Window *window;
-    SDL_GLContext context = initialize(window);
+    glv(SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3), "Failed to set version");
+    glv(SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3), "Failed to set version");
+    glv(SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE), "Failed to set core profile");
+
+    SDL_GLContext context = glp(SDL_GL_CreateContext(window), "OpenGL context could not be created");
 
     bool quit = false;
     while (!quit) {
         handle_events(&quit);
-        render(window);
+        glClearColor(0.0f, 0.8f, 0.2f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        SDL_GL_SwapWindow(window);
         SDL_Delay(1000.0f / 60);
     }
 
